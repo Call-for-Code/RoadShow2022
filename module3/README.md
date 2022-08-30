@@ -83,7 +83,7 @@ From here you may monitor the progress of each task.
 
 ## What's next?
 
-- The pipeline can be integrated with some security elements like;
+- Try integrating with some security elements like;
   - Running Unit Tests
   - Ensure continuous code quality and security by scanning the code base with [SonarQube](https://www.sonarqube.org/).
     - SonarQube detects bugs, vulnerabilities, and code issues. It can integrate with your workflow to enable continuous code inspection across your project branches and pull requests. The tool reports the overall health and quality of your source code and highlights issues that are found in new code. The code analyzers detect tricky bugs, such as null-pointer dereferences, logic errors, and resource leaks, for more than 20 coding languages.
