@@ -85,7 +85,8 @@ From here you may monitor the progress of each task.
 
 - The pipeline can be integrated with some security elements like;
   - Running Unit Tests
-  - Monitor code quality and security by scanning the code base with [Sonarqube](https://www.sonarqube.org/).
+  - Ensure continuous code quality and security by scanning the code base with [SonarQube](https://www.sonarqube.org/).
     - SonarQube detects bugs, vulnerabilities, and code issues. It can integrate with your workflow to enable continuous code inspection across your project branches and pull requests. The tool reports the overall health and quality of your source code and highlights issues that are found in new code. The code analyzers detect tricky bugs, such as null-pointer dereferences, logic errors, and resource leaks, for more than 20 coding languages.
     - SonarQube fits with your tools. You are proactively notified when the quality or security of your codebase is at risk. Non-disruptive code quality checks overlay your workflow and intelligently promote clean builds.
+    - Refer the [SonarQube documentation](https://docs.sonarqube.org/latest/)
 - Try adding Triggers for the pipeline to automatically run the pipeline to build and deploy the project when new changes are merged to Git repo. Please refer the [OpenShift documentation](https://docs.openshift.com/container-platform/4.11/cicd/builds/triggering-builds-build-hooks.html) to learn more about adding Triggers.
