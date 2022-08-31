@@ -13,5 +13,5 @@ Legit Info resources can be updated weekly in the database from the Legiscan gov
 By classifying legislation by impact and location, we hope to increase awareness of current and pending legislation and their ability to affect change through voting or other activism.
 
 <p align="center">
-  <img src="docs/legit-info-flow.png" alt="Legit Info Architecture" width ="100%" height="120%">
+  <img src="images/legit-info-flow.png" alt="Legit Info Architecture" width ="100%" height="120%">
 </p>

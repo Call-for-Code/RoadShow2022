@@ -4,44 +4,29 @@ Follow these instructions to participate in the desired module of the presentati
 ## Module 1
 ### Operating Systems
 #### Linux
-- RHEL 8.6
+- RHEL 9.0 or 8.6
   - Install **docker-ce** following [these](https://docs.docker.com/engine/install/rhel/) instructions.
-  - Install git and postgresql client
+  - Install git
     ```
-    dnf install git postgresql
+    dnf install git
     ```
 
 - Ubuntu 22.04
   - Install **docker-ce** following [these](https://docs.docker.com/engine/install/ubuntu/) instructions.
-  - Install packages **git, python3 and postgresql client** using the following command:
+  - Install packages **git** using the following command:
     ```
-    apt install git python3 postgresql-client
-    ```
-  - Install **pipenv**
-    ```
-    pip3 install --user pipenv
+    apt install git
     ```
 ### Windows 10
   - Download and install [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/).
   - Install **Git** following [these](https://github.com/git-guides/install-git#install-git-on-windows) instructions.
-  - Install **Python 3** following [these](https://www.python.org/downloads/windows/) instructions.
-    > Ensure the python 3 version is 3.6.1 and higher by running the command `python3 --version`
-  - Setup **SQLite**
-    1. Download files `sqlite-dll-win32-x86*.zip` and `sqlite-tools-win32-x86*.zip` from https://www.sqlite.org/download.html
-    2. Unpack and add dictory to _PATH_ environment variable.
 
 ### Mac
   - Download and install [Docker Desktop](https://www.docker.com/products/docker-desktop/).
-  - Install **Python** following [these](https://github.com/git-guides/install-git#install-git-on-mac) instructions.
-    > Ensure that python3 is installed. You need at least 3.6.x or later.
   - Install **Git** via Homebrew using the following command:
     ```
     brew install git
     ```
-  - Setup **SQLite 3**
-    1. Download binary from [here](https://www.sqlite.org/download.html).
-    2. Unpack and add directory to _PATH_ environment variable.
-  - Install *PostgreSQL** using [these](https://postgresapp.com/) instructions.
 
 
 ## Modules 2 and 3
