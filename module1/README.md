@@ -1,7 +1,7 @@
-# Project overview
+# Module 1 overview
 
 ## Learning objectives
-At the end of this lab, you will have deployed the Legit-Info solution in your local environment and started with the first step of modernization: containers. 
+At the end of this workshop, you will have deployed the Legit-Info solution in your local environment and started with the first step of modernization: containers. 
 
 The solution uses the following technologies and frameworks:
 
@@ -14,6 +14,7 @@ The solution uses the following technologies and frameworks:
 * Gunicorn: A WSGI HTTP webserver for Python
 * NLTK: Natural Language Toolkit
 * Watson Studio Natural Language Understanding
+* Docker for containers
 
 The following repositories are used to automate the collection of legislation:
 * Legiscan.com: API for all 50 USA states
@@ -21,55 +22,17 @@ The following repositories are used to automate the collection of legislation:
 * Ohio.gov: Ohio State website
 
 # Prerequisites
-This lab requires the following software to be installed on your machine. 
-1. Git
-2. Python (3.6 or above)
-3. SQLite
-4. A way to create and run Docker containers. For Windows and macOS, you might use Docker Desktop. For some Linux distributions, Docker Desktop is also offered, but you can also just run Docker Engine.
+Please refer to the [Prerequisties](../docs/prerequisites.md) documentation for the necessary tools needed for this workshop.
 
-You can check if the prerequisites are installed using the following commands:
+Afterwards, you can check if the prerequisites are installed using the following commands:
 
 ```bash
 git --version
 ```
 
 ```bash
-python3 --version && pip3 --version
-```
-
-```bash
-sqlite3 --version
-```
-
-```bash
 docker --version
 ```
-
-# Install the prerequisites
-## pipenv
-**Pipenv** is a package management tool for Python. The lab uses it to automatically create and manage a virtual environment for your local project. 
-
-```bash
-pip3 install --user pipenv
-```
-
-You can check if `pipenv` was installed by checking the version:
-```bash
-pipenv --version
-```
-
-## SQLite3
-The lab uses a local SQLite database to store tables such as:
-* user
-* user_groups
-* user_profiles
-* locations
-* impacts
-
-![](images/sqlite-dbs.png)
-
-
-[SQLite](https://sqlite.org/index.html) is a small, fast, self-contained, high-reliability, full-featured, embedded SQL database engine. A complete SQL database with multiple tables, indices, triggers, and views is contained in a single disk file. Python comes with the sqlite3 module, so you don't have to install anything in the lab environment for you application to interact with the database.
 
 # Clone the repository
 The source code for Legit-Info lives on Github. You can either clone the source directory or `fork` the repository to create your own copy and then clone that.
@@ -84,178 +47,60 @@ git clone https://github.com/Call-for-Code-for-Racial-Justice/Legit-Info.git
 cd Legit-Info
 ```
 
-# Set up Django environment
-**NOTE**: this section will contain instructions for running on both Windows and macOS/Linux and will be indicated as needed.
+# The development environment
+Normally when a team develops an application locally, they will install the tools and frameworks needed to do their work. There can sometimes be downsides to this approach. Differences in operating systems, language versions, and configurations can create frustrations and slow down development time. 
 
-## Create virtual environment
-Create a Python virtual environment using pipenv:
-```bash
-pipenv shell
-``` 
+For this workshop, instead of having to install specific versions of the prerequisites on your local machine, we have opted to introduce a Docker container as the development runtime. This will guarantee compatibility on any operating system that can run Docker and introduces a unique way for teams and individuals to setup development environments for future projects. 
 
-If the environment was created successfully, you should see output similar to this:
-```bash
-✔ Successfully created virtual environment! 
-Virtualenv location: /home/theia/.local/share/virtualenvs/Legit-Info-_tFjoHw6
-Launching subshell in virtual environment...
-theia@theiadocker-upkar:/home/project/Legit-Info$  . /home/theia/.local/share/virtualenvs/Legit-Info-_tFjoHw6/bin/activate
-```
-You should also notice that the prompt changes to reflect the new virtual environment. You can type "exit" to leave the virtual environment.
-```bash
-(Legit-Info) theia@theiadocker-upkar:/home/project/Legit-Info$ 
-``` 
+## What are containers and why use them?
+Containers are an abstraction that bundles your code files and runs them in an isolated environment that you are certain will have the correct code, framework, and library versions your application requires. Containers also, in most cases, require less resources to execute and are smaller compared to virtual machines or baremetal, allowing you to run more applications. This allows you to, for example, run several containers that use different versions of Python or Django all next to each other without any complications.
 
-## Install Python dependencies
-To run the project, you first need to install the dependencies in the virtual environment. These dependencies are defined in `Pipfile` file. You can use `pipenv` as follows:
+Containers are the building blocks for microservices and multi-cloud deployments as they are standardized and very portable. You can create, replicate, and destroy containers very quickly, allowing for faster development cycles and continuous deployments. The sky is the limit!
 
-```bash
-pipenv install
-```
+## Analyzing Dockerfile-devenv
+The Dockerfile we are using is called `Dockerfile-devenv`. We use a Python slim base image to start with. This allows us to target a specific version of Python, 3.9.13 in this case.
 
-## Migrate database
-Migrations are Django’s way of propagating changes you make to your models (adding a field, deleting a model, etc.) into your database schema. You should think of migrations as a version control system for your database schema. `makemigrations` will package up your model changes into individual migration files - analogous to commits - and migrate will apply those to your database.
+We then set some environment variables and install certain dependencies via `pip`. One of the important dependencies is `pipenv`, which allows us to make use of a virtual environment in the container and install application dependencies in the `Pipfile`. This line `RUN PIPENV_VENV_IN_PROJECT=1 pipenv install --deploy` handles installing the dependencies.
 
-First, use the `makemigrations` command to create the schema for tables used by the Django models:
+We also create a non-root user called `appuser` and change to that user near the end of the file. 
 
-**Linux and macOS**:
-```bash
-./stage1 makemigrations
-```
+We expose port `8080` as the application runs on that port, which you will see in `entrypoint-dev.sh`. 
 
-**Windows**:
-```
-stage1.bat makemigrations
-```
+## Analyzing entrypoint-dev.sh
+This file will automatically run a few Django scripts and start our development webserver. The scripts will create and update the database, which is run with SQLite, and will also seed the database with sample data.
 
-Second, use the `migrate` command to create these tables in the sqlite database:
+The last line starts the web server on port 8080.
 
-**Linux and macOS**:
-```bash
-./stage1 migrate
-```
+## SQLite3 database
+The workshop uses a local SQLite database to store tables such as:
+* user
+* user_groups
+* user_profiles
+* locations
+* impacts
 
-**Windows**:
-```
-stage1.bat migrate
-```
+![](images/sqlite-dbs.png)
 
-The SQLite database is stored in `db.sqlite3` in the root folder. This is a binary file and you will need an SQLite client to read it.
+
+[SQLite](https://sqlite.org/index.html) is a small, fast, self-contained, high-reliability, full-featured, embedded SQL database engine. A complete SQL database with multiple tables, indices, triggers, and views is contained in a single disk file. Python comes with the sqlite3 module, so you don't have to install anything extra for you application to interact with the database.
 
 ## Seed data
-You will now seed some initial data so that some locations, impacts, and legislation show up when you visit the site.
+The provided seed data will input some locations, impacts, and legislation show up when you visit the site.
 
-First, seed the initial data from the `sources/cfc-seed.json` file:
+The first file is located at `sources/cfc-seed.json`. This file contains an admin user to login with and inputs some locations.
 
-**Linux and macOS**:
-```bash
-./stage1 syncdata sources/cfc-seed.json
-```
-
-**Windows**:
-```
-stage1.bat syncdata sources\cfc-seed.json
-```
-
-You should see output as follows:
-```bash
-(Legit-Info) theia@theia-upkar:/home/project/Legit-Info$ ./stage1 syncdata sources/cfc-seed.json
-**Using SQLite3**
-Installing json fixture 'sources/cfc-seed' from absolute path.
-Installed 25 objects from 1 fixture
-```
-
-Second, add the legislation data from the `sources/cfc-law30.json` file:
-
-**Linux and macOS**:
-```bash
-./stage1 syncdata sources/cfc-law30.json
-```
-
-**Windows**:
-```
-stage1.bat syncdata sources\cfc-law30.json
-```
-
-You should see output as follows:
-```bash
-(Legit-Info) theia@theia-upkar:/home/project/Legit-Info$ ./stage1 syncdata sources/cfc-law30.json 
-**Using SQLite3**
-Installing json fixture 'sources/cfc-law30' from absolute path.
-Installed 30 objects from 1 fixture
-```
-
-Let's look at the legislation data we just added:
+The second file is located at `sources/cfc-law30.json`. This file contains some sample legislation information to view.
 ![](images/sqlite-laws.png)
 
-## Create superuser
-We will create a superuser user in this step. The superuser has access to the admin pages and is able to:
-* Manage users
-* Create new locations
-* Edit existing locations
-* Create new impacts
-* Edit existing impacts
+# Run and launch the application
+From the project root directory, we will run the development environment using Docker Compose. The command is `docker compose -f docker-compose-devenv.yaml up`. This will start the services in the compose file and show any logging output in the terminal. You can also run in detatched mode by adding the `-d` flag to the end. This would allow you to free up the terminal to do other things.
 
-Use this command to start the process:
-
-**Linux and macOS**:
-```bash
-./stage1 createsuperuser
-```
-
-**Windows**:
-```
-stage1.bat createsuperuser
-```
-
-You will be asked to fill in the username, name and password. The `cfcadmin` username is already taken. You can use any other username.
-```bash
-(Legit-Info) theia@theiadocker-upkar:/home/project/Legit-Info$ ./stage1 createsuperuser
-**Using SQLite3**
-Username (leave blank to use 'root'): cfcadmin007
-Email address: example@gmail.com
-Password: 
-Password (again): 
-Superuser created successfully.
-```
-
-# Run the server locally
-**NOTE**: this section will contain instructions for running on both Windows and macOS/Linux and will be indicated as needed.
-
-To run the server locally, you can again use the `stage` utility as follows:
-
-**Linux and macOS**:
-```bash
-./stage1
-```
-
-**Windows**:
-```
-stage1.bat
-```
-
-You should see the following output:
-```bash
-**Using SQLite3**
-**Using SQLite3**
-Watching for file changes with StatReloader
-05-04 18:57:09 autoreload:run_with_reloader [INFO] Watching for file changes with StatReloader
-Performing system checks...
-
-System check identified no issues (0 silenced).
-May 04, 2021 - 18:57:09
-Django version 3.1.8, using settings 'cfc_project.settings'
-Starting development server at http://127.0.0.1:8000/
-Quit the server with CONTROL-C.
-```
-
-## Run and launch the application
-Open a browser and navigate to `http://localhost:3000`. You should see the application running.
+Open a browser and navigate to `http://localhost:8080`. You should see the application running.
 
 ![](images/legit-info-tab.png)
 
 Now that we have the application running, let's explore it. 
 
-# Explore the application
 The application has a top menu:
 * Search
 * Locations
@@ -292,13 +137,13 @@ Click on the `Impacts` link on the top menu bar. You should see the following im
 * Jobs
 ```
 
-## Register yourself as a new user
-Click on the `Register` link on the top menu bar to create a new account for yourself.
+## Register new accounts
+Click on the `Register` link on the top menu bar to create a new account.
 
 ![](images/user-register-1.png)
 
 ## Admin interface
-Django has a built-in administrator interface that you can access from the top URL menu. It reads metadata from your models to provide a quick, model-centric interface where trusted users can manage content on your site. Click on the `Sign in` link to launch the admin interface and log in with the `superuser` username and password you created earlier.
+Django has a built-in administrator interface that you can access from the top URL menu. It reads metadata from your models to provide a quick, model-centric interface where trusted users can manage content on your site. Click on the `Sign in` link to launch the admin interface and log in with the `cfcadmin` username with password `Call4Code`.
 
 ![](images/admin-sign-in.png)
 
@@ -313,18 +158,16 @@ You can search for a law by clicking on `Laws`
 Try searching for laws that have the word `health` in them.
 ![](images/laws-search-2.png)
 
-Explore the different filters on the left side to filter laws by impact or location. You will deploy the application to IBM Cloud using the Command Line Interface (CLI) from the terminal in the next step. Press "Ctrl-C" to terminate the running application. 
+Explore the different filters on the left side to filter laws by impact or location. You will deploy the application to IBM Cloud using the Command Line Interface (CLI) from the terminal in the next step. 
 
-# Containerize the application
-We will now build and run the application from a container using Docker. 
+## Finishing up
+When you've finished exploring, you can run `docker compose -f docker-compose-devenv.yaml down` to stop the services. If you didn't run in detatched mode above, you may need to CTRL-C first, and then run the down command. 
 
-## What are containers and why use them?
-Containers are an abstraction that bundles your code files and runs them in an isolated environment that you are certain will have the correct code, framework, and library versions your application requires. Containers also, in most cases, require less resources to execute and are smaller compared to virtual machines or baremetal, allowing you to run more applications. This allows you to, for example, run several containers that use different versions of Python or Django all next to each other without any complications.
-
-Containers are the building blocks for microservices and multi-cloud deployments as they are standardized and very portable. You can create, replicate, and destroy containers very quickly, allowing for faster development cycles and continuous deployments. The sky is the limit!
+# Containerize the application for a production scenario
+Up to this point, we have been using a container to serve our development environment requirements. We can use a nearly identical process to create a container image that can be used for production deployments.
 
 ## Inspect the Dockerfile
-Open the Dockerfile in the root of the project directory. Let's look at each line and discuss it's purpose.
+Open the `Dockerfile` in the root of the project directory. Let's look at each line and discuss it's purpose.
 
 `FROM registry.access.redhat.com/ubi8/python-38:1-71.1634036286` - Specifies the base container image to utilize. In this case, we are using the Python 3.8 variant of the RedHat Universal Base Image. This image is also locked in at a particular release version, which is preferable for stability in production environments.
 
@@ -358,8 +201,6 @@ Sets various environment variables:
 `CMD ["gunicorn", "-b", "0.0.0.0:8080",  "--env", "DJANGO_SETTINGS_MODULE=cfc_project.settings", "cfc_project.wsgi", "--timeout 120"]` - This is the command that will run our code using `gunicorn`
 
 ## Build the container image
-First, let's ensure that the `docker` command is available in your terminal window. Type `docker --version` and you should get output that should be similar to `Docker version 20.10.7, build 20.10.7-0ubuntu5~18.04.3`.
-
 To build the Dockerfile into a new container image, run `docker build . -t legit-info`. This command tells Docker to build in the current directory with a tag of `legit-info`. 
 You will see some output that downloads the base image and layers each subsequent command in the Dockerfile on top of it. 
 
@@ -372,7 +213,7 @@ legit-info       latest    6c76b5885c97   15 seconds ago  1.21GB
 ## Run the containerized application
 Now, you can run the container with the following command: `docker run -p 8080:8080 legit-info`. This command will start the container image `legit-info` that we built before and connects the container's 8080 port to the host's 8080 port.
 
-To see the application running from the container, navigate to `http://localhost:8080` in your browser. 
+To see the application running from the container, navigate to `http://localhost:8080` in your browser. You should notice that this container image running looks identical to the development environment version we made use of earlier.
 
 After you have verified the application is running, go back to your terminal and press `Ctrl-C` to stop the container from running.
 
@@ -418,9 +259,9 @@ To do this:
 Now, we can stop the container from running and restart it to see if our changes persisted like we expect. Back in the terminal, press `Ctrl-C` to stop the container. After the container stops, you can re-enter the same run command (`docker run -p 8080:8080 -v legit-info-db:/opt/app-root/src legit-info`), navigate to `http:localhost:8080`. When you click on the `Search` button, you should still see `Texas` in the Locations list. 
 
 # Next steps
-Congratulations on finishing the lab.
+Congratulations on finishing module 1 of the workshop.
 
-In this hands-on lab, you: 
+In this hands-on workshop, you: 
 * Installed pipenv to manage python dependencies
 * Cloned the Legit-Info repository from Github
 * Ran Django migrations to set up the initial SQLite database
@@ -430,13 +271,14 @@ In this hands-on lab, you:
 
 Where do you go from here?
 
+## Continue on to module 2
+You can view the next module's instructions [here](../module2/README.md).
+
 ## Join the Call for Code for Racial Justice community
 Talk to the Legit-Info project team by joining the [Call for Code for Racial Justice community](https://developer.ibm.com/callforcode/racial-justice/get-started?utm_medium=Exinfluencer&utm_source=Exinfluencer&utm_content=000026UJ&utm_term=10008917&utm_id=NA-SkillsNetwork-Gitlab-legitinfocfc2021rj-2021-05-01).
 
 ## Contribute to the open source project
 Now that you know the different pieces that make up the Legit-Info application, you can contribute back to the open source project on Github. The [issues section](https://github.com/Call-for-Code-for-Racial-Justice/Legit-Info/issues) is a great place to start.
-
-LINK TO PART 2
 
 **Authors:**
 * Tony Pearson
