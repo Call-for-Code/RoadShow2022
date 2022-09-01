@@ -6,7 +6,7 @@ Furthermore, since each module does not require completion of the previous, soft
 > These requirements are based on the recommendations for **Red Hat OpenShift Local** which is utilized in modules 2 and 3.  For more details, see the following [article](https://access.redhat.com/documentation/en-us/red_hat_openshift_local/2.5/html/getting_started_guide/installation_gsg#minimum-system-requirements_gsg).
 -  4 physical CPU cores
 -  9 GB of free memory
--  35 GB of storage space
+-  35 GB of storage space 
 
 ## Software
 ### Module 1
