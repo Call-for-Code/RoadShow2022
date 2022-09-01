@@ -1,6 +1,6 @@
 # Prerequisites
 Here we provide guidance on the hardware and software requirements to participate in this technical workshop.<br />
-Furthermore, since each module does not require completion of the previous, sofware requirements are separted out by module(s).
+Furthermore, since each module does not require completion of the previous, software requirements are separated out by module(s).
 
 ## Hardware
 > These requirements are based on the recommendations for **Red Hat OpenShift Local** which is utilized in modules 2 and 3.  For more details, see the following [article](https://access.redhat.com/documentation/en-us/red_hat_openshift_local/2.5/html/getting_started_guide/installation_gsg#minimum-system-requirements_gsg).
