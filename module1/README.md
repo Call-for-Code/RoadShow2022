@@ -167,38 +167,11 @@ When you've finished exploring, you can run `docker compose -f docker-compose-de
 Up to this point, we have been using a container to serve our development environment requirements. We can use a nearly identical process to create a container image that can be used for production deployments.
 
 ## Inspect the Dockerfile
-Open the `Dockerfile` in the root of the project directory. Let's look at each line and discuss it's purpose.
+Open the `Dockerfile` in the root of the project directory. If you compare this Dockerfile to `Dockerfile-devenv`, you will notice quite a lot of similarities. We are using the same base image, but we are also making use of multi-stage builds. A Dockerfile setup in this way allows you to create smaller and more efficient container images by only putting the code and artifacts you need into the final output image while the contents in the intermediate container images.
 
-`FROM registry.access.redhat.com/ubi8/python-38:1-71.1634036286` - Specifies the base container image to utilize. In this case, we are using the Python 3.8 variant of the RedHat Universal Base Image. This image is also locked in at a particular release version, which is preferable for stability in production environments.
+You can analyze each build section by finding the lines that start with `FROM`. We copy artifacts from other build steps using `COPY --from` and providing the name of the build step. 
 
-`WORKDIR /opt/app-root/src` - This sets the working directory for the container. This directory is created if it doesn't already exist.
-
-`COPY --chown=1001:0 . .` - This copies the files from the project directory into the container and changes ownership to the non-root user (1001).
-
-`RUN chmod -R g=u .` - This changes the group ownership of all the copied files to the non-root user (1001).
-
-`USER 1001` - Changes the container to run as the non-root user.
-
-```
-ENV LC_ALL=C.UTF-8 \
-    LANG=C.UTF-8 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONFAULTHANDLER=1
-```
-Sets various environment variables:
-
-* `LC_ALL=C.UTF-8` - Overrides the localization settings
-* `LANG=C.UTF-8` - Sets the language of the container
-* `PYTHONDONTWRITEBYTECODE=1` - Prevents Python from writing `.pyc` files on the import of source modules
-* `PYTHONFAULTHANDLER=1` - Enables the fault handler in order to dump the Python traceback
-
-`RUN pip install --no-cache-dir --upgrade pip==21.3.1 && pip install --no-cache-dir pipenv==2018.11.26 && pipenv install --system --dev` - Installs theh packages using specific versions of `pip` and `pipenv`
-
-`EXPOSE 8080` - Exposes port 8080 of the container to the host
-
-`ENTRYPOINT ["sh", "entrypoint.sh"]` - The default entrypoint script that starts the container
-
-`CMD ["gunicorn", "-b", "0.0.0.0:8080",  "--env", "DJANGO_SETTINGS_MODULE=cfc_project.settings", "cfc_project.wsgi", "--timeout 120"]` - This is the command that will run our code using `gunicorn`
+The other major difference is that, with the development environment setup, we don't copy the code into the container. We instead using a volume mapping in the `compose` file to map the code into a directory in the container. This allows for developers to make changes to the code and see the updates live. In this "production" Dockerfile, we copy the code into the container and it runs from in the container.
 
 ## Build the container image
 To build the Dockerfile into a new container image, run `docker build . -t legit-info`. This command tells Docker to build in the current directory with a tag of `legit-info`. 
@@ -259,17 +232,6 @@ To do this:
 Now, we can stop the container from running and restart it to see if our changes persisted like we expect. Back in the terminal, press `Ctrl-C` to stop the container. After the container stops, you can re-enter the same run command (`docker run -p 8080:8080 -v legit-info-db:/opt/app-root/src legit-info`), navigate to `http:localhost:8080`. When you click on the `Search` button, you should still see `Texas` in the Locations list. 
 
 # Next steps
-Congratulations on finishing module 1 of the workshop.
-
-In this hands-on workshop, you: 
-* Installed pipenv to manage python dependencies
-* Cloned the Legit-Info repository from Github
-* Ran Django migrations to set up the initial SQLite database
-* Seeded the database with legislation from a subset of states 
-* Ran the application in the development environment
-* Containerized the application and ran it with Docker
-
-Where do you go from here?
 
 ## Continue on to module 2
 You can view the next module's instructions [here](../module2/README.md).
