@@ -71,8 +71,8 @@ This file will automatically run a few Django scripts and start our development 
 
 The last line starts the web server on port 8080.
 
-## SQLite3 database
-The workshop uses a local SQLite database to store tables such as:
+## Database
+This module uses a local SQLite database to store tables such as:
 * user
 * user_groups
 * user_profiles
