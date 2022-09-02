@@ -57,8 +57,8 @@ Containers are an abstraction that bundles your code files and runs them in an i
 
 Containers are the building blocks for microservices and multi-cloud deployments as they are standardized and very portable. You can create, replicate, and destroy containers very quickly, allowing for faster development cycles and continuous deployments. The sky is the limit!
 
-## Analyzing Dockerfile-devenv
-The Dockerfile we are using is called `Dockerfile-devenv`. We use a Python slim base image to start with. This allows us to target a specific version of Python, 3.9.13 in this case.
+## Inspect Dockerfile-devenv
+The Dockerfile we are using for development purposes is called `Dockerfile-devenv`. We use a Python slim base image to start with. This allows us to target a specific version of Python, 3.9.13 in this case.
 
 We then set some environment variables and install certain dependencies via `pip`. One of the important dependencies is `pipenv`, which allows us to make use of a virtual environment in the container and install application dependencies in the `Pipfile`. This line `RUN PIPENV_VENV_IN_PROJECT=1 pipenv install --deploy` handles installing the dependencies.
 
@@ -66,7 +66,7 @@ We also create a non-root user called `appuser` and change to that user near the
 
 We expose port `8080` as the application runs on that port, which you will see in `entrypoint-dev.sh`. 
 
-## Analyzing entrypoint-dev.sh
+## Inspect entrypoint-dev.sh
 This file will automatically run a few Django scripts and start our development webserver. The scripts will create and update the database, which is run with SQLite, and will also seed the database with sample data.
 
 The last line starts the web server on port 8080.
@@ -81,10 +81,9 @@ The workshop uses a local SQLite database to store tables such as:
 
 ![](images/sqlite-dbs.png)
 
+In module 2, we will introduce PostgreSQL, which is a more robust database provider.
 
-[SQLite](https://sqlite.org/index.html) is a small, fast, self-contained, high-reliability, full-featured, embedded SQL database engine. A complete SQL database with multiple tables, indices, triggers, and views is contained in a single disk file. Python comes with the sqlite3 module, so you don't have to install anything extra for you application to interact with the database.
-
-## Seed data
+### Seed data
 The provided seed data will input some locations, impacts, and legislation show up when you visit the site.
 
 The first file is located at `sources/cfc-seed.json`. This file contains an admin user to login with and inputs some locations.
@@ -93,7 +92,13 @@ The second file is located at `sources/cfc-law30.json`. This file contains some 
 ![](images/sqlite-laws.png)
 
 # Run and launch the application
-From the project root directory, we will run the development environment using Docker Compose. The command is `docker compose -f docker-compose-devenv.yaml up`. This will start the services in the compose file and show any logging output in the terminal. You can also run in detatched mode by adding the `-d` flag to the end. This would allow you to free up the terminal to do other things.
+From the project root directory, we will run the development environment using Docker Compose. The command is:
+
+```bash
+docker compose -f docker-compose-devenv.yaml up
+```
+
+This will start the services in the compose file and show any logging output in the terminal. You can also run in detatched mode by adding the `-d` flag to the end. This would allow you to free up the terminal to do other things.
 
 Open a browser and navigate to `http://localhost:8080`. You should see the application running.
 
@@ -161,9 +166,15 @@ Try searching for laws that have the word `health` in them.
 Explore the different filters on the left side to filter laws by impact or location. You will deploy the application to IBM Cloud using the Command Line Interface (CLI) from the terminal in the next step. 
 
 ## Finishing up
-When you've finished exploring, you can run `docker compose -f docker-compose-devenv.yaml down` to stop the services. If you didn't run in detatched mode above, you may need to CTRL-C first, and then run the down command. 
+When you've finished exploring, you can run
 
-# Containerize the application for a production scenario
+```bash
+docker compose -f docker-compose-devenv.yaml down
+```
+
+to stop the services. If you didn't run in detatched mode above, you may need to CTRL-C first, and then run the down command. 
+
+# Production scenario
 Up to this point, we have been using a container to serve our development environment requirements. We can use a nearly identical process to create a container image that can be used for production deployments.
 
 ## Inspect the Dockerfile
@@ -174,17 +185,35 @@ You can analyze each build section by finding the lines that start with `FROM`. 
 The other major difference is that, with the development environment setup, we don't copy the code into the container. We instead using a volume mapping in the `compose` file to map the code into a directory in the container. This allows for developers to make changes to the code and see the updates live. In this "production" Dockerfile, we copy the code into the container and it runs from in the container.
 
 ## Build the container image
-To build the Dockerfile into a new container image, run `docker build . -t legit-info`. This command tells Docker to build in the current directory with a tag of `legit-info`. 
+To build the Dockerfile into a new container image, run 
+
+```bash
+docker build . -t legit-info
+```
+ This command tells Docker to build in the current directory with a tag of `legit-info`. 
 You will see some output that downloads the base image and layers each subsequent command in the Dockerfile on top of it. 
 
-After the build finishes, you can run `docker images` to see the list of container images. You should see a line for the `legit-info` image we just built that looks similar to:
+After the build finishes, you can run 
+
+```bash
+docker images
+``` 
+
+to see the list of container images. You should see a line for the `legit-info` image we just built that looks similar to:
+
 ```
 REPOSITORY       TAG       IMAGE ID       CREATED         SIZE
 legit-info       latest    6c76b5885c97   15 seconds ago  1.21GB
 ```
 
 ## Run the containerized application
-Now, you can run the container with the following command: `docker run -p 8080:8080 legit-info`. This command will start the container image `legit-info` that we built before and connects the container's 8080 port to the host's 8080 port.
+Now, you can run the container with the following command
+
+```bash
+docker run -p 8080:8080 legit-info
+```
+
+This command will start the container image `legit-info` that we built before and connects the container's 8080 port to the host's 8080 port.
 
 To see the application running from the container, navigate to `http://localhost:8080` in your browser. You should notice that this container image running looks identical to the development environment version we made use of earlier.
 
@@ -201,9 +230,21 @@ This can be addressed in a couple different ways:
 
 For now, we will focus on the first point: creating a Docker volume for the database file to persist between sessions.
 
-We can create a Docker named volume with the command `docker volume create legit-info-db`. To use this volume, we run a similar `docker run` command from above and add a new flag (`-v`) to tell the container to use the named volume we created. 
+We can create a Docker named volume with the command 
 
-The command is `docker run -p 8080:8080 -v legit-info-db:/opt/app-root/src legit-info`. The parameter for the `-v` flag contains the name of the volume (`legit-info-db`) and the directory inside the container where the file is located (`/opt/app-root/src`). If you remember, our Dockerfile contains a line that sets the working directory, and that is the directory we need in this command.
+```bash
+docker volume create legit-info-db
+```
+
+To use this volume, we run a similar `docker run` command from above and add a new flag (`-v`) to tell the container to use the named volume we created. 
+
+The command is 
+
+```bash
+docker run -p 8080:8080 -v legit-info-db:/opt/app-root/src legit-info
+```
+
+The parameter for the `-v` flag contains the name of the volume (`legit-info-db`) and the directory inside the container where the file is located (`/opt/app-root/src`). If you remember, our Dockerfile contains a line that sets the working directory, and that is the directory we need in this command.
 
 You can verify the application is running again by navigating to `http://localhost:8080`.
 
@@ -229,25 +270,15 @@ To do this:
   * Click the `Search` button. 
   * Open the `Locations` dropdown and verify `Texas` shows in the list.
   
-Now, we can stop the container from running and restart it to see if our changes persisted like we expect. Back in the terminal, press `Ctrl-C` to stop the container. After the container stops, you can re-enter the same run command (`docker run -p 8080:8080 -v legit-info-db:/opt/app-root/src legit-info`), navigate to `http:localhost:8080`. When you click on the `Search` button, you should still see `Texas` in the Locations list. 
+Now, we can stop the container from running and restart it to see if our changes persisted like we expect. Back in the terminal, press `Ctrl-C` to stop the container. After the container stops, you can re-enter the same run command 
+
+```bash
+docker run -p 8080:8080 -v legit-info-db:/opt/app-root/src legit-info
+```
+
+and navigate to `http:localhost:8080`. When you click on the `Search` button, you should still see `Texas` in the Locations list. 
 
 # Next steps
 
 ## Continue on to module 2
 You can view the next module's instructions [here](../module2/README.md).
-
-## Join the Call for Code for Racial Justice community
-Talk to the Legit-Info project team by joining the [Call for Code for Racial Justice community](https://developer.ibm.com/callforcode/racial-justice/get-started?utm_medium=Exinfluencer&utm_source=Exinfluencer&utm_content=000026UJ&utm_term=10008917&utm_id=NA-SkillsNetwork-Gitlab-legitinfocfc2021rj-2021-05-01).
-
-## Contribute to the open source project
-Now that you know the different pieces that make up the Legit-Info application, you can contribute back to the open source project on Github. The [issues section](https://github.com/Call-for-Code-for-Racial-Justice/Legit-Info/issues) is a great place to start.
-
-**Authors:**
-* Tony Pearson
-* Upkar Lidder
-* Charlie Evans
-* Gaurav Ramakrishna
-* Charles Johnson
-
-**Other contributors:**
-* Jennifer Judge Clark
