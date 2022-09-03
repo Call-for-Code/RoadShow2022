@@ -79,7 +79,7 @@ This module uses a local SQLite database to store tables such as:
 * locations
 * impacts
 
-![](images/sqlite-dbs.png)
+![](../assests/module1/sqlite-dbs.png)
 
 In module 2, we will introduce PostgreSQL, which is a more robust database provider.
 
@@ -89,7 +89,7 @@ The provided seed data will input some locations, impacts, and legislation show 
 The first file is located at `sources/cfc-seed.json`. This file contains an admin user to login with and inputs some locations.
 
 The second file is located at `sources/cfc-law30.json`. This file contains some sample legislation information to view.
-![](images/sqlite-laws.png)
+![](../assests/module1/sqlite-laws.png)
 
 # Run and launch the application
 From the project root directory, we will run the development environment using Docker Compose. The command is:
@@ -102,7 +102,7 @@ This will start the services in the compose file and show any logging output in 
 
 Open a browser and navigate to `http://localhost:8080`. You should see the application running.
 
-![](images/legit-info-tab.png)
+![](../assests/module1/legit-info-tab.png)
 
 Now that we have the application running, let's explore it. 
 
@@ -145,23 +145,23 @@ Click on the `Impacts` link on the top menu bar. You should see the following im
 ## Register new accounts
 Click on the `Register` link on the top menu bar to create a new account.
 
-![](images/user-register-1.png)
+![](../assests/module1/user-register-1.png)
 
 ## Admin interface
 Django has a built-in administrator interface that you can access from the top URL menu. It reads metadata from your models to provide a quick, model-centric interface where trusted users can manage content on your site. Click on the `Sign in` link to launch the admin interface and log in with the `cfcadmin` username with password `Call4Code`.
 
-![](images/admin-sign-in.png)
+![](../assests/module1/admin-sign-in.png)
 
 Once logged in, click on the `Admin` link to launch the administrative interface.
 
-![](images/admin-link.png)
+![](../assests/module1/admin-link.png)
 
 You can search for a law by clicking on `Laws`
 
-![](images/laws-search-1.png)
+![](../assests/module1/laws-search-1.png)
 
 Try searching for laws that have the word `health` in them.
-![](images/laws-search-2.png)
+![](../assests/module1/laws-search-2.png)
 
 Explore the different filters on the left side to filter laws by impact or location. You will deploy the application to IBM Cloud using the Command Line Interface (CLI) from the terminal in the next step. 
 
