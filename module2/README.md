@@ -142,11 +142,15 @@ And we have...
 > ![Connected to the App!](../assets/module2/connected_to_the_app.png)
 
 ## Cleaning up
-Delete the deployments by running the following command:
-```
-oc delete -f configurations/openshift/deployment/.
-```
-this process may take 30 seconds or so to complete.  Progress may be monitored using the command methods discussed in the section _Monitoring progress_.
+-  Delete deployments
+    ```
+    oc delete -f configurations/openshift/deployment/.
+    ```
+-  Delete namespace
+    ```
+    oc delete ns roadshow
+    ```
+This process may take to up a minute to complete.  Progress may be monitored using the methods discussed in the section _Monitoring progress_.<br />
 
 ## What's next?
 Continue to [module 3](../module3/README.md) to learn how to automate updates to this deployment using _Red Hat OpenShift Pipelines_.

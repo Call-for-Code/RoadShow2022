@@ -102,7 +102,7 @@ From here you may monitor the progress of each task.
     ```
     oc delete ns roadshow
     ```
-This process may take to up a minute so to complete.  Progress may be monitored using the methods discussed in the section _Monitoring progress_.<br />
+This process may take to up a minute to complete.  Progress may be monitored using the methods discussed in the section _Monitoring progress_.<br />
 
 ## What's next?
 - Try integrating with some security elements like:
