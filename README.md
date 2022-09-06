@@ -13,10 +13,10 @@ Legit Info resources can be updated weekly in the database from the Legiscan gov
 By classifying legislation by impact and location, we hope to increase awareness of current and pending legislation and their ability to affect change through voting or other activism.
 
 <p align="center">
-  <img src="docs/legit-info-flow.png" alt="Legit Info Architecture" width ="100%" height="120%">
+  <img src="assets/main/legit-info-flow.png" alt="Legit Info Architecture" width ="100%" height="120%">
 </p>
 
-## Join the Call for Code for Racial Justice community
+## Join the **Call for Code for Racial Justice** community
 Talk to the Legit-Info project team by joining the [Call for Code for Racial Justice community](https://developer.ibm.com/callforcode/racial-justice/get-started?utm_medium=Exinfluencer&utm_source=Exinfluencer&utm_content=000026UJ&utm_term=10008917&utm_id=NA-SkillsNetwork-Gitlab-legitinfocfc2021rj-2021-05-01).
 
 ## Contribute to the open source project

@@ -1,14 +1,17 @@
 # Deploying to OpenShift
-In this module, we will use the deploy Legit Info paired with a PostgreSQL database to OpenShift installed on your laptop.
+In this module, we will deploy Legit-Info now paired with a PostgreSQL database to OpenShift Local.
 
 ## Prerequisites
-1. See [Modules 2 and 3](../docs/prerequisites.md) in the _prerequisites_ article.
-2.  Clone the **Legit Info** project:
+1.  See [Modules 2 and 3](../docs/prerequisites.md) in the _prerequisites_ article.
+2.  Clone the **Legit-Info** project:
     ```
     git clone https://github.com/Call-for-Code-for-Racial-Justice/Legit-Info.git
+    ```
+3.  Change to the project directory:
+    ```
     cd Legit-Info
     ```
-3.  Use these [instructions](../docs/connect_to_openshift_local.md) to connect to the OpenShift Local instance.
+4.  Use these [instructions](../docs/connect_to_openshift_local.md) to connect to the OpenShift Local instance.
 
 ## Convert the Docker compose file
 We will use [kompose](https://kompose.io) to convert the Docker compose creating the following components to deploy on OpenShift:
@@ -106,8 +109,10 @@ Let's start by review of the file.
 
 ## Monitoring progress
 Wait until both pods report a **Ready** status of `1/1`.
+-  In the **web console**, navigate to _Workloads > Pods_
+   > <img alt="Monitoring from web" src="../assets/module2/monitoring_progress_ui.png" width="100%" />
 -  Command line
-   > **Note**: Use Ctrl+X to break the command.
+   > <img alt="Monitoring from command line" src="../assets/module2/monitoring_progress_cmd.png" width="65%" />
    -  MacOS or Linux
       ```
       watch -n5 oc get pods
@@ -116,12 +121,36 @@ Wait until both pods report a **Ready** status of `1/1`.
       ```
       while (1) {cls;oc get pods;sleep 5}
       ```
--  Web GUI<br/>
-   -  Navigate to _Workloads > Pods_
 
 ## Connect to the application
-Navigate to the following URL in a browser:
->  http://legitinfo-roadshow.apps-crc.testing
+Let's determine the route to the application.
+-  From command line:
+   ```
+   $ oc get routes
+   NAME        HOST/PORT                             PATH   SERVICES    PORT   TERMINATION   WILDCARD
+   legitinfo   legitinfo-roadshow.apps-crc.testing          legitinfo   8080                 None
+   ```
+   here we will use the URL under **HOST/PORT** adding `http://` to the beginning.
+-  From the **web console** navigate to _Networking > Routes_ in the table, locate _legitinfo_ then select the copy icon under the _Location_ column.
+   > <img alt="Locating route in web console" src="../assets/module2/locating_route_ui.png" width="100%" />
+
+Or simply copy the URL below into the browser.
+```
+http://legitinfo-roadshow.apps-crc.testing
+```
+And we have...
+> ![Connected to the App!](../assets/module2/connected_to_the_app.png)
+
+## Cleaning up
+-  Delete deployments
+    ```
+    oc delete -f configurations/openshift/deployment/.
+    ```
+-  Delete namespace
+    ```
+    oc delete ns roadshow
+    ```
+This process may take to up a minute to complete.  Progress may be monitored using the methods discussed in the section _Monitoring progress_.<br />
 
 ## What's next?
-Continue to [module 3](../module3/README.md) to learn out to autmoate updates to this deployment using _Red Hat OpenShift Pipelines_.
+Continue to [module 3](../module3/README.md) to learn how to automate updates to this deployment using _Red Hat OpenShift Pipelines_.
